@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2020",
     "module": "commonjs",
-    "lib": ["es6", "dom"], // Make sure "dom" is included
+    "lib": ["es2020", "dom"], // Make sure "dom" is included
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true
