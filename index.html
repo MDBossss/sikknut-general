@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Random Imgur Image Generator</title>
+    <style>
+      .image-container {
+        margin: 10px;
+        display: inline-block;
+      }
+      .controls {
+        margin: 20px;
+      }
+      button {
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <button onclick="generateImages()">Generate New Images</button>
+      Number of images:
+      <input type="number" id="numImages" value="5" min="1" max="20" />
+    </div>
+    <div id="imageContainer"></div>
+
+    <script>
+      function generateRandomId() {
+        const chars =
+          "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return (
+          Array(5)
+            .fill(0)
+            .map(() => chars.charAt(Math.floor(Math.random() * chars.length)))
+            .join("") + "b"
+        );
+      }
+
+      function generateImgurUrl() {
+        return `https://i.imgur.com/${generateRandomId()}.png`;
+      }
+
+      function generateBackupUrls(count) {
+        return Array(count)
+          .fill(0)
+          .map(() => generateImgurUrl())
+          .join(",");
+      }
+
+      function createImageElement() {
+        const mainUrl = generateImgurUrl();
+        const backupUrls = generateBackupUrls(20);
+
+        const container = document.createElement("div");
+        container.className = "image-container";
+
+        const img = document.createElement("img");
+        img.src = mainUrl;
+        img.style.width = "150px";
+        img.style.height = "150px";
+        img.style.opacity = "0";
+        img.dataset.backupUrls = backupUrls;
+        img.dataset.bi = "-1";
+
+        img.onload = function () {
+          if (this.naturalWidth !== 161) {
+            this.style.opacity = "1";
+            return;
+          }
+          this.dataset.bi = Number(this.dataset.bi) + 1;
+          const bi = this.dataset.bi;
+          const urls = this.dataset.backupUrls.split(",");
+          if (bi <= urls.length) {
+            this.src = urls[bi];
+          }
+        };
+
+        const urlText = document.createElement("div");
+        urlText.innerHTML = `<small>URL: ${mainUrl}</small>`;
+
+        container.appendChild(img);
+        container.appendChild(urlText);
+
+        return container;
+      }
+
+      function generateImages() {
+        const container = document.getElementById("imageContainer");
+        container.innerHTML = ""; // Clear existing images
+
+        const numImages =
+          parseInt(document.getElementById("numImages").value) || 5;
+        const limitedNum = Math.min(Math.max(numImages, 1), 20); // Limit between 1 and 20
+
+        for (let i = 0; i < limitedNum; i++) {
+          container.appendChild(createImageElement());
+        }
+      }
+
+      // Generate initial set of images when page loads
+      generateImages();
+    </script>
+  </body>
+</html>
