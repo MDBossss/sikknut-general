@@ -15,7 +15,7 @@ function generateImgurUrl() {
 
 export async function getRandomImage(message: any) {
   // Launch Puppeteer browser
-  const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
+  const browser = await puppeteer.launch({ headless: true });
   const tempDir = path.join(__dirname, "temp_images");
 
   // Ensure the temporary directory exists
@@ -28,16 +28,17 @@ export async function getRandomImage(message: any) {
 
       try {
         // Load the local HTML file
-        await page.goto(`file://${path.join(__dirname, "template.html")}`);
+        await page.goto(`https://peach-dierdre-74.tiiny.site/`);
 
         // Set the src attribute of the <img> tag
         await page.evaluate((url) => {
-          (document.getElementById("randomImg") as HTMLImageElement).src! = url;
+          (document.getElementById("imageElement") as HTMLImageElement).src! =
+            url;
         }, imgurUrl);
 
         // Wait for the image to load, then capture a screenshot
-        await page.waitForSelector("#randomImg");
-        const imgElement = await page.$("#randomImg");
+        await page.waitForSelector("#imageElement");
+        const imgElement = await page.$("#imageElement");
 
         const filePath = path.join(tempDir, `img_${i}.png`);
         await imgElement?.screenshot({ path: filePath });
